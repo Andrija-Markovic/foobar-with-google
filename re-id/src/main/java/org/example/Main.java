@@ -1,8 +1,22 @@
 package org.example;
 
+// RE-ID
+// ========
+// You need to generate an ID for a worker. From a string of only prime numbers “235711131719…”,
+// given a number n, return the digit from the position n and the next 4 digits.
+// Test cases
+// ============
+// Input:
+// n=0
+// Output:
+// “23571”
+
+// Input:
+// n=3
+// Output:
+// “71113”
 public class Main {
     public static void main(String[] args) {
-        //n 0-10000
         int n = 10000;
         System.out.println(solution(n));
     }
