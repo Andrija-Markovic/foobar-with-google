@@ -64,6 +64,75 @@ package org.example;
 // 487067745
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        int numberOfBricks = 200;
+
+        long start = System.nanoTime();
+        System.out.println(solution(numberOfBricks));
+        long end = System.nanoTime();
+
+        double execT = (end - start) * 1e-9;
+
+        System.out.println(execT);
+    }
+
+    private static int solution(int n) {
+        int validCombinations = 0;
+
+        int[] staircase = new int[n];
+
+        validCombinations = layBricks(
+                staircase,
+                0,
+                0,
+                n,
+                validCombinations,
+                n
+        );
+
+        return validCombinations;
+    }
+
+    private static int layBricks(int[] staircase,
+                                 int position,
+                                 int prevStepHeight,
+                                 int leftoverBricks,
+                                 int validCombos,
+                                 int totalBricks) {
+        int maxFirstStepHeight = 0;
+
+        if (position == 0) {
+            if (totalBricks % 2 == 0) {
+                maxFirstStepHeight = totalBricks / 2 - 1;
+            } else {
+                maxFirstStepHeight = totalBricks / 2;
+            }
+        }
+
+        for(int currentStepHeight = prevStepHeight + 1; currentStepHeight <= leftoverBricks; currentStepHeight++) {
+            staircase[position] = currentStepHeight;
+
+            if (position == 0 && currentStepHeight > maxFirstStepHeight) {
+                return validCombos;
+            }
+
+            if (leftoverBricks - staircase[position] == 0 && staircase[position] != totalBricks) {
+                validCombos++;
+                return validCombos;
+            } else if (staircase[position] < leftoverBricks - staircase[position]) {
+                validCombos = layBricks(
+                        staircase,
+                        position+1,
+                        staircase[position],
+                        leftoverBricks - staircase[position],
+                        validCombos,
+                        totalBricks
+                );
+            } else {
+                validCombos++;
+                return validCombos;
+            }
+        }
+
+        return validCombos;
     }
 }
