@@ -48,18 +48,42 @@ package org.example;
 // Output:
 // 11
 
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// program's output: 153
+
+
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class Main {
     public static void main(String[] args) {
         int[][] map = new int[][] {
-         {0, 0, 0, 0, 0, 0},
-         {1, 1, 1, 1, 1, 0},
-         {0, 0, 0, 0, 0, 0},
-         {0, 1, 1, 1, 1, 1},
-         {0, 1, 1, 1, 1, 1},
-         {0, 0, 0, 0, 0, 0}
+                {0,0,0,0,0,0,1},
+                {0,0,0,0,0,1,0},
+                {0,0,0,0,1,0,0},
+                {0,0,0,1,0,0,0},
+                {0,0,1,0,0,0,0},
+                {0,1,0,0,0,0,0},
+                {1,0,0,0,0,0,0},
         };
 
         long start = System.nanoTime();
@@ -85,7 +109,7 @@ public class Main {
 
             map[currentTile.x][currentTile.y] = currentTile.value;
 
-            if (currentTile.getX() == mapW -1 && currentTile.getY() == mapH -1) {
+            if (currentTile.getX() == mapH -1 && currentTile.getY() == mapW -1) {
                 continue;
             }
 
@@ -95,21 +119,21 @@ public class Main {
             checkTile(map, currentTile.x, currentTile.y -1, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
         }
 
-        return map[mapW-1][mapH-1];
+        return map[mapH-1][mapW-1];
     }
 
     private static void checkTile(int[][] map, int x, int y, int prevTileValue, boolean hasWallBeenBroken, Queue<Tile> tilesToVisit) {
         int mapW = map[0].length;
         int mapH = map.length;
 
-        if (x == -1 || x == mapW || y == -1 || y == mapH) return;
+        if (x == -1 || x == mapH || y == -1 || y == mapW) return;
 
         if (map[x][y] == 0) {
-            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, true));
+            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, hasWallBeenBroken));
         } else if (map[x][y] == 1 && !(x == 0 && y == 0) && !hasWallBeenBroken) {
-            tilesToVisit.add(new Tile(x, y, map[x][y] + 1, true));
+            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, true));
         } else if (map[x][y] >= prevTileValue) {
-            tilesToVisit.add(new Tile(x, y, map[x][y] + 1, hasWallBeenBroken));
+            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, hasWallBeenBroken));
         }
     }
 
