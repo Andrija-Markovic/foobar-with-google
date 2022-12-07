@@ -68,7 +68,7 @@ package org.example;
 // {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-// program's output: 153
+// output: 153
 
 
 import java.util.LinkedList;
@@ -78,13 +78,16 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args) {
         int[][] map = new int[][] {
-                {0,0,0,0,0,0,1},
-                {0,0,0,0,0,1,0},
-                {0,0,0,0,1,0,0},
-                {0,0,0,1,0,0,0},
-                {0,0,1,0,0,0,0},
-                {0,1,0,0,0,0,0},
-                {1,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,1},
+                {1,1,1,1,1,1,0,1},
+                {1,1,1,1,1,1,0,1},
+                {1,1,0,0,0,1,0,1},
+                {1,1,0,1,0,0,0,1},
+                {1,1,0,1,1,1,1,1},
+                {1,1,0,1,1,1,1,1},
+                {1,0,0,1,1,1,1,1},
+                {1,0,1,1,1,1,1,1},
+                {1,0,0,0,0,0,0,0}
         };
 
         long start = System.nanoTime();
@@ -114,7 +117,6 @@ public class Main {
             }
         }
         return shortestPath;
-
     }
 
     private static int[][] bfs(int[][] map, int mapH, int mapW, int x, int y) {
@@ -134,11 +136,13 @@ public class Main {
             Tile currentTile = tilesToVisit.poll();
             int currentX = currentTile.getX();
             int currentY = currentTile.getY();
+            int currentTileValue = shadowMap[currentX][currentY];
 
-            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentX, currentY, currentX, currentY + 1);
-            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentX, currentY, currentX, currentY - 1);
-            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentX, currentY, currentX + 1, currentY);
-            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentX, currentY, currentX - 1, currentY);
+
+            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentTileValue, currentX, currentY + 1);
+            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentTileValue, currentX, currentY - 1);
+            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentTileValue, currentX + 1, currentY);
+            checkTile(map, mapH, mapW, shadowMap, tilesToVisit, currentTileValue, currentX - 1, currentY);
         }
         return shadowMap;
     }
@@ -149,14 +153,14 @@ public class Main {
             int mapW,
             int[][] shadowMap,
             Queue<Tile> tilesToVisit,
-            int oldX,
-            int oldY,
+            int prevTileValue,
             int newX,
             int newY) {
         if(newX >=0 && newY >=0 && newX < mapH && newY < mapW && shadowMap[newX][newY] == 0) {
-            shadowMap[newX][newY] = shadowMap[oldX][oldY] + 1;
-            if (map[newX][newY] == 1)
-                return;
+            shadowMap[newX][newY] = prevTileValue + 1;
+
+            if (map[newX][newY] == 1) return;
+
             tilesToVisit.add(new Tile(newX, newY));
         }
     }
@@ -178,78 +182,96 @@ public class Main {
             return this.y;
         }
     }
-}
-//public class Main {
-//
-//
-//    private static int solution(int[][] map) {
-//        int mapW = map[0].length;
-//        int mapH = map.length;
-//
-//        Queue<Tile> tilesToVisit = new LinkedList<>();
-//
-//        tilesToVisit.add(new Tile(0, 0, 1, false));
-//
-//        while (!tilesToVisit.isEmpty()) {
-//            Tile currentTile = tilesToVisit.poll();
-//
-//            map[currentTile.x][currentTile.y] = currentTile.value;
-//
+
+    private static int mySolution(int[][] map) {
+        int mapH = map.length;
+        int mapW = map[0].length;
+        int shortestPath = 1000;
+
+        int[][] forwardTraverse = myBfs(map, mapH, mapW,0,0);
+        int[][] backwardTraverse = myBfs(map, mapH, mapW,mapH - 1,mapW - 1);
+
+
+        for(int i = 0; i < mapH; ++i) {
+            for(int j = 0; j < mapW; ++j) {
+                if(forwardTraverse[i][j] > 0 && backwardTraverse[i][j] > 0) {
+                    shortestPath = Math.min(shortestPath, forwardTraverse[i][j] + backwardTraverse[i][j] - 1);
+                }
+            }
+        }
+        return shortestPath;
+    }
+
+    private static int[][] myBfs(int[][] map, int mapH, int mapW, int x, int y) {
+        int[][] shadowMap = new int[mapH][mapW];
+
+        Queue<MyTile> tilesToVisit = new LinkedList<>();
+
+        tilesToVisit.add(new MyTile(x, y, 1, false));
+
+        for (int k = 0; k < mapH; ++k)
+            Arrays.fill(shadowMap[k], 0);
+
+        while (!tilesToVisit.isEmpty()) {
+            MyTile currentTile = tilesToVisit.poll();
+
+            map[currentTile.getX()][currentTile.getY()] = currentTile.value;
+
 //            if (currentTile.getX() == mapH -1 && currentTile.getY() == mapW -1) {
 //                continue;
 //            }
-//
-//            checkTile(map, currentTile.x + 1, currentTile.y, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
-//            checkTile(map, currentTile.x, currentTile.y + 1, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
-//            checkTile(map, currentTile.x - 1, currentTile.y, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
-//            checkTile(map, currentTile.x, currentTile.y -1, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
-//        }
-//
-//        return map[mapH-1][mapW-1];
-//    }
-//
-//    private static void checkTile(int[][] map, int x, int y, int prevTileValue, boolean hasWallBeenBroken, Queue<Tile> tilesToVisit) {
-//        int mapW = map[0].length;
-//        int mapH = map.length;
-//
-//        if (x == -1 || x == mapH || y == -1 || y == mapW) return;
-//
-//        if (map[x][y] == 0) {
-//            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, hasWallBeenBroken));
-//        } else if (map[x][y] == 1 && !(x == 0 && y == 0) && !hasWallBeenBroken) {
-//            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, true));
-//        } else if (map[x][y] >= prevTileValue) {
-//            tilesToVisit.add(new Tile(x, y, prevTileValue + 1, hasWallBeenBroken));
-//        }
-//    }
-//
-//    public static class Tile {
-//        private final int x;
-//        private final int y;
-//        private final int value;
-//        private final boolean hasWallBeenBroken;
-//
-//        public Tile(int x, int y, int value, boolean hasWallBeenBroken) {
-//            this.x = x;
-//            this.y = y;
-//            this.value = value;
-//            this.hasWallBeenBroken = hasWallBeenBroken;
-//        }
-//
-//        public int getX() {
-//            return this.x;
-//        }
-//
-//        public int getY() {
-//            return this.y;
-//        }
-//
-//        public int getValue() {
-//            return this.value;
-//        }
-//
-//        public boolean hasWallBeenBroken() {
-//            return this.hasWallBeenBroken;
-//        }
-//    }
-//}
+
+            checkTile(map, currentTile.getX() + 1, currentTile.getY(), currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
+            checkTile(map, currentTile.getX(), currentTile.getY() + 1, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
+            checkTile(map, currentTile.getX() - 1, currentTile.getY(), currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
+            checkTile(map, currentTile.getX(), currentTile.getY() -1, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
+        }
+
+        return shadowMap;
+    }
+
+    private static void checkTile(int[][] map, int x, int y, int prevTileValue, boolean hasWallBeenBroken, Queue<MyTile> tilesToVisit) {
+        int mapW = map[0].length;
+        int mapH = map.length;
+
+        if (x == -1 || x == mapH || y == -1 || y == mapW) return;
+
+        if (map[x][y] == 0) {
+            tilesToVisit.add(new MyTile(x, y, prevTileValue + 1, hasWallBeenBroken));
+        } else if (map[x][y] == 1 && !(x == 0 && y == 0) && !hasWallBeenBroken) {
+            tilesToVisit.add(new MyTile(x, y, prevTileValue + 1, true));
+        } else if (map[x][y] >= prevTileValue) {
+            tilesToVisit.add(new MyTile(x, y, prevTileValue + 1, hasWallBeenBroken));
+        }
+    }
+
+    private static class MyTile {
+        private final int x;
+        private final int y;
+        private final int value;
+        private final boolean hasWallBeenBroken;
+
+        public MyTile(int x, int y, int value, boolean hasWallBeenBroken) {
+            this.x = x;
+            this.y = y;
+            this.value = value;
+            this.hasWallBeenBroken = hasWallBeenBroken;
+        }
+
+        public int getX() {
+            return this.x;
+        }
+
+        public int getY() {
+            return this.y;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+
+        public boolean hasWallBeenBroken() {
+            return this.hasWallBeenBroken;
+        }
+    }
+}
