@@ -91,7 +91,7 @@ public class Main {
         };
 
         long start = System.nanoTime();
-        int shortestPathLength = solution(map);
+        int shortestPathLength = mySolution(map);
         long end = System.nanoTime();
 
         double execT = (end - start) * 1e-9;
@@ -186,31 +186,10 @@ public class Main {
     private static int mySolution(int[][] map) {
         int mapH = map.length;
         int mapW = map[0].length;
-        int shortestPath = 1000;
-
-        int[][] forwardTraverse = myBfs(map, mapH, mapW,0,0);
-        int[][] backwardTraverse = myBfs(map, mapH, mapW,mapH - 1,mapW - 1);
-
-
-        for(int i = 0; i < mapH; ++i) {
-            for(int j = 0; j < mapW; ++j) {
-                if(forwardTraverse[i][j] > 0 && backwardTraverse[i][j] > 0) {
-                    shortestPath = Math.min(shortestPath, forwardTraverse[i][j] + backwardTraverse[i][j] - 1);
-                }
-            }
-        }
-        return shortestPath;
-    }
-
-    private static int[][] myBfs(int[][] map, int mapH, int mapW, int x, int y) {
-        int[][] shadowMap = new int[mapH][mapW];
 
         Queue<MyTile> tilesToVisit = new LinkedList<>();
 
-        tilesToVisit.add(new MyTile(x, y, 1, false));
-
-        for (int k = 0; k < mapH; ++k)
-            Arrays.fill(shadowMap[k], 0);
+        tilesToVisit.add(new MyTile(0, 0, 1, false));
 
         while (!tilesToVisit.isEmpty()) {
             MyTile currentTile = tilesToVisit.poll();
@@ -227,7 +206,7 @@ public class Main {
             checkTile(map, currentTile.getX(), currentTile.getY() -1, currentTile.getValue(), currentTile.hasWallBeenBroken(), tilesToVisit);
         }
 
-        return shadowMap;
+        return map[mapH-1][mapW-1];
     }
 
     private static void checkTile(int[][] map, int x, int y, int prevTileValue, boolean hasWallBeenBroken, Queue<MyTile> tilesToVisit) {
