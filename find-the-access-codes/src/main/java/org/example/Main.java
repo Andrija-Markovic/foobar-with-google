@@ -38,12 +38,30 @@ package org.example;
 
 public class Main {
     public static void main(String[] args) {
-        int[] l = new int[] {1, 2, 3, 4, 5, 6};
+        int[] l = new int[] {1, 1, 1};
 
-        System.out.println(solution(l));
+        System.out.println(n2Solution(l));
     }
 
-    private static int solution(int[] l) {
+    private static int n2Solution(int[] l) {
+        int numberOfAccessCodes = 0;
+        int[] numberOfPairs = new int[l.length];
+
+        if (l.length == 2) return numberOfAccessCodes;
+
+        for (int i = 0; i < l.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (l[i] % l[j] == 0) {
+                    numberOfPairs[i]++;
+                    numberOfAccessCodes += numberOfPairs[j];
+                }
+            }
+        }
+
+        return numberOfAccessCodes;
+    }
+
+    private static int n3Solution(int[] l) {
         int numberOfAccessCodes = 0;
 
         if (l.length == 2) return numberOfAccessCodes;
